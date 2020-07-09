@@ -1,0 +1,65 @@
+Working on the titanic dataset from kaggle:
+First, we will load the data and create a datset from it.
+For reading the csv values, we will load the 'readr' package and the 'dplyr' package into our environment.
+```{r}
+library(readr)
+library(dplyr)
+```
+Next, we load the train data.
+```{r}
+train<-read_csv('C:/Users/win10/Downloads/titanic/train.csv')
+head(train)
+```
+Next, we will drop the name attribute from our train data because it is not of any significance.
+```{r}
+train<-select(train, -Name)
+```
+And the PassengerId attribute as well
+```{r}
+train<-select(train, -PassengerId)
+```
+Now, we will look at our data again
+```{r}
+train<-select(train, -Ticket, -Cabin, -Embarked)
+head(train)
+colnames(train)
+```
+Now, we tranform the Sex column into integers where 0 represents male and 1 represents female.
+```{r}
+train$Sex_num <- ifelse(train$Sex=="male", 1, 0)
+train<-select(train, -Sex)
+head(train)
+```
+
+```{r}
+head(train)
+```
+Doing the same to the test data:
+```{r}
+test<-read_csv('C:/Documents and Settings/win10/Downloads/titanic/test.csv')
+id<-test$PassengerId
+test<-select(test, -Name, -PassengerId, -Ticket, -Cabin, -Embarked, -Ticket)
+test$Sex_num <- ifelse(test$Sex=="male", 1, 0)
+test<-select(test, -Sex)
+head(test)
+```
+Training our model using linear regression:
+```{r}
+model=glm(formula=Survived~Pclass+Age+SibSp+Parch+Fare+Sex_num, family = "binomial", data = train, )
+
+```
+Now, we predict the survived attribute in the test data
+```{r}
+test$Survived<-predict(model, test, type = "response")
+```
+Writing our predicted data into a csv file:
+```{r}
+test<-select(test, Survived)
+test$PassengerId<-id
+test$Survived<-ifelse(test$Survived>=0.5, 1, 0)
+test<-select(test, PassengerId, Survived)
+head(test)
+plot(test)
+data<-write_csv(x=test, path = 'data.csv')
+```
+
