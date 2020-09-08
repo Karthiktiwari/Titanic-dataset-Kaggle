@@ -1,2 +1,1 @@
-# learning
-The work I did as I learnt along.
+My first ML model on the titanic dataset using R.
